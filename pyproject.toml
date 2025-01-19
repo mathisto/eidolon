@@ -14,6 +14,7 @@ dependencies = [
     "llm (>=0.19.1,<0.20.0)",
     "openai (>=0.19.1)",
     "psycopg2 (>=2.9.10,<3.0.0)",
+    "prompt-toolkit (>=3.0.48,<4.0.0)",
 ]
 
 [tool.poetry]
