@@ -38,7 +38,7 @@ def generate_local_embedding(text):
 def get_db_connection():
     return psycopg2.connect(Config.DB_URL, cursor_factory=RealDictCursor)
 
-def get_relevant_context(query):
+def get_relevant_context(query, limit=50):  # Set a higher default limit if needed
     connection = get_db_connection()
     cursor = connection.cursor()
 
@@ -51,8 +51,8 @@ def get_relevant_context(query):
         SELECT content, timestamp
         FROM archival_memory
         ORDER BY embedding <#> %s::vector ASC
-        LIMIT 5;
-        """, (query_embedding,)
+        LIMIT %s;
+        """, (query_embedding, limit)  # Pass the limit parameter here
     )
     results = cursor.fetchall()
     connection.close()

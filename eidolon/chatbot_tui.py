@@ -1,50 +1,43 @@
 import requests
-from prompt_toolkit import PromptSession
-from prompt_toolkit.history import InMemoryHistory
-from prompt_toolkit.styles import Style
+from colorama import Fore, Style, init
 
-# API Endpoint for your chatbot
+# Initialize colorama
+init(autoreset=True)
+
 API_URL = "http://127.0.0.1:8080/query"
-
-# Terminal UI Style
-style = Style.from_dict({
-    "prompt": "bold green",
-    "response": "italic",
-    "error": "bold red",
-})
+DEBUG_MODE = True
 
 def query_chatbot(user_query):
-    """
-    Send the user query to the chatbot API and return the response.
-    """
     try:
         response = requests.post(
             API_URL,
             json={"user_query": user_query},
             headers={"Content-Type": "application/json"},
         )
+
+        if DEBUG_MODE:
+            print(f"DEBUG: {Fore.CYAN}Sending request to API...{Style.RESET_ALL}")
+            print(f"DEBUG: Response status: {Fore.YELLOW}{response.status_code}{Style.RESET_ALL}")
+
         response.raise_for_status()
         return response.json().get("response", "No response received.")
     except requests.exceptions.RequestException as e:
-        return f"Error: {e}"
+        return f"{Fore.RED}Error: {e}{Style.RESET_ALL}"
 
 def main():
-    """
-    Main function to run the chatbot terminal UI.
-    """
     print("Welcome to Eidolon Chatbot! (Type 'exit' to quit)\n")
-    session = PromptSession(history=InMemoryHistory())
 
     while True:
         try:
-            user_query = session.prompt("You: ", style=style)
+            user_query = input("You: ")
             if user_query.lower() in {"exit", "quit"}:
                 print("Goodbye!")
                 break
 
             # Get response from chatbot
             chatbot_response = query_chatbot(user_query)
-            print(f"Eidolon: {chatbot_response}")
+            # Print response in a different color
+            print(f"Eidolon: {Fore.GREEN}{chatbot_response}{Style.RESET_ALL}")
 
         except (KeyboardInterrupt, EOFError):
             print("\nGoodbye!")
