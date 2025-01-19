@@ -22,12 +22,12 @@ def get_relevant_context(query):
     # Generate query embedding
     query_embedding = generate_embedding(query)
 
-    # Perform similarity search
+    # Perform similarity search with explicit cast
     cursor.execute(
         """
         SELECT content, timestamp
         FROM archival_memory
-        ORDER BY embedding <#> %s ASC
+        ORDER BY embedding <#> %s::vector ASC
         LIMIT 5;
         """, (query_embedding,)
     )
@@ -36,6 +36,7 @@ def get_relevant_context(query):
 
     # Format the retrieved context with timestamps
     return "\n".join([f"[{row['timestamp']}] {row['content']}" for row in results])
+
 
 # Insert new data with timestamp
 def insert_into_db(content):

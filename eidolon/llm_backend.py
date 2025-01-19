@@ -1,21 +1,24 @@
+from openai import OpenAI
 import requests
 from eidolon.config import Config
 
+client = OpenAI(api_key=Config.OPENAI_API_KEY)
+
 # Query OpenAI LLM
 def query_openai(prompt, context):
-    import openai
-    openai.api_key = Config.OPENAI_API_KEY
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "system", "content": context}, {"role": "user", "content": prompt}]
-    )
-    return response["choices"][0]["message"]["content"]
+    response = client.chat.completions.create(model="gpt-3.5-turbo",
+    messages=[
+        {"role": "system", "content": context},
+        {"role": "user", "content": prompt},
+    ])
+    return response.choices[0].message.content
 
 # Query Ollama LLM
 def query_ollama(prompt, context):
     url = Config.OLLAMA_API_URL + "/api/query"
     payload = {"prompt": f"{context}\n{prompt}"}
     response = requests.post(url, json=payload)
+    response.raise_for_status()
     return response.json().get("response", "Error: No response from Ollama")
 
 # Main LLM query function
