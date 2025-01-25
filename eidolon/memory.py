@@ -38,7 +38,7 @@ def generate_local_embedding(text):
 def get_db_connection():
     return psycopg2.connect(Config.DB_URL, cursor_factory=RealDictCursor)
 
-def get_relevant_context(query, limit=50):  # Set a higher default limit if needed
+def get_relevant_context(query, limit=10):  # Set a higher default limit if needed
     connection = get_db_connection()
     cursor = connection.cursor()
 
