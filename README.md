@@ -1,46 +1,49 @@
-Usage
+# EIDOLON API Documentation
 
-Set Up Your Environment:
+## Usage
 
-Install Python dependencies:
+### Set Up Your Environment
 
-pip install -r requirements.txt
+1. Install Python dependencies:
 
-Ensure PostgreSQL is running with pgvector installed and configured.
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-Configure Environment Variables:
+2. Ensure PostgreSQL is running with `pgvector` installed and configured.
 
-Set up the following variables in your .env file or system:
+3. Configure Environment Variables:
+   Set up the following variables in your `.env` file or system environment:
+   OPENAI_API_KEY=your_openai_api_key OLLAMA_API_URL=http://100.108.91.106:11434 DATABASE_URL=postgresql://user:password@localhost:5432/eidolon ACTIVE_LLM=openai # Options: "openai", "ollama"
 
-OPENAI_API_KEY=your_openai_api_key
-OLLAMA_API_URL=http://100.108.91.106:11434
-DATABASE_URL=postgresql://user:password@localhost:5432/eidolon
-ACTIVE_LLM=openai  # Options: "openai", "ollama"
+### Running the Application/Server
 
-Run the Application:
+`uvicorn app:app --reload`
 
-Start the FastAPI server:
+Access the API at http://127.0.0.1:8000
 
-uvicorn app:app --reload
+### Querying the API
+Use the `/query` endpoint to send a user query and receive enriched responses.
 
-Access the API at http://127.0.0.1:8000.
+#### Example cURL Request:
 
-Query the API:
+```sh
+curl -X POST "http://127.0.0.1:8000/query" \
+  -H "Content-Type: application/json" \
+  -d '{"user_query": "Hello!"}'
+```
 
-Use /query endpoint to send a user query and receive enriched responses.
+### Database Management
+Use the functions in `memory.py` to insert and retrieve archival data.
 
-Example cURL:
+### Additional Documentation
+- Local Embeddings: Ensure SentenceTransformers is installed and integrated for efficient local embedding generation.
+- Metadata: Timestamps are stored and retrieved to provide historical context for responses.
+- Custom Backends: Modify config.py to add new LLM backends or customize existing ones.
 
-curl -X POST "http://127.0.0.1:8000/query" -H "Content-Type: application/json" -d '{"user_query": "Hello!"}'
+## Contributing
 
-Database Management:
+Contributions are welcome! Please read the [CONTRIBUTING.md](CONTRIBUTING.md) file for details on how to contribute.
 
-Use memory.py functions to insert and retrieve archival data.
-
-Additional Documentation
-
-Local Embeddings: Ensure SentenceTransformers is installed and integrated for efficient local embedding generation.
-
-Metadata: Timestamps are stored and retrieved to provide historical context for responses.
-
-Custom Backends: Modify config.py to add new LLM backends or customize existing ones.
+## License
+[MIT License](LICENSE)
