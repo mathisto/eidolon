@@ -1,9 +1,39 @@
 version: '3.8'
 
 services:
+  postgres:
+    image: postgres:15
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB="eidolon"
+      - POSTGRES_USER="mathisto"
+      - POSTGRES_PASSWORD=${EIDOLON_PG_PASS}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    command: |
+      sh -c "pg_restore --no-password --exit-on-error || pg_ctl initdb && \
+             echo 'host all  all     trust' >> /etc/pg_hba.conf && \
+             echo 'enable_TLS = off' > /var/lib/postgresql/data/pg_config.txt && \
+             pg_ctl start"
+
+    # Install and enable pgvector
+    init:
+      postgres: |
+        psql -U $POSTGRES_USER -d $POSTGRES_DB -c "CREATE EXTENSION IF NOT EXISTS pgvector;"
+
   eidolon:
     build: .
     ports:
       - "8080:8080"
     environment:
       - PORT=8080
+      - DB_URL=postgresql://mathisto:${EIDOLON_PG_PASS}@postgres:5432/eidolon
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OLLAMA_API_URL=http://100.108.91.106:11434
+      - ACTIVE_LLM=openai
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
